@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// API สำหรับให้ Dev จัดการ product ที่ mana เก็บให้
+/// API สำหรับให้ Dev จัดการ database ที่ mana เก็บให้
 /// Apply RouteParameter to all API?
 /// </summary>
-interface ProductManageAPI
+interface DatabaseManagementAPI
 {
     /// <summary>
     /// Generate id
@@ -15,18 +15,7 @@ interface ProductManageAPI
     /// <returns>generated id</returns>
     string GenerateId(string prefix, GenerateIdOptions options = null);
 
-    /// <summary>
-    /// Create Database
-    /// </summary>
-    /// <param name="databaseName"></param>
-    /// <param name="configurations">
-    /// Specify database options
-    /// - Product collection name
-    /// - autorun id for Product collection 
-    /// - autorun id prefix for Product collection
-    /// </param>
-    /// <returns></returns>
-    DatabaseDetail CreateDatabase(string databaseName, DatabaseConfigurations configurations);
+    //TODO: GetDatabaseDetail, ConfigDatabase จำเป็นต้องมีมั้ย
     /// <summary>
     /// Get Database Detail
     /// </summary>
@@ -37,7 +26,10 @@ interface ProductManageAPI
     /// </summary>
     /// <param name="configurations">
     /// Specify database options
-    /// - Product database name
+    /// - Product collection name
+    /// - autorun id for Product collection 
+    /// - autorun id prefix for Product collection
+    /// - bla..
     /// </param>
     /// <returns>Database Detail</returns>
     DatabaseDetail ConfigDatabase(DatabaseConfigurations configurations);
@@ -86,6 +78,7 @@ interface ProductManageAPI
     /// <summary>
     /// Get single document detail by id
     /// </summary>
+    /// <param name="collectionId">collection id</param>
     /// <param name="id">document id</param>
     /// <param name="querySyntax">???</param>
     /// <returns>document detail</returns>
@@ -127,12 +120,18 @@ class CollectionDetail { }
 class CollectionConfigurations { }
 class Document { }
 class CreateDocumentOptions { }
+class Response { }
 
 /// <summary>
 /// API สำหรับลงทะเบียน product ให้ mana app เปิดได้
 /// </summary>
 interface ThirdAPI
 {
+    //register dev
+    //register add product hook
+    //register cart hook
+    //register order hook
+    //register payment hook
     /// <summary>
     /// Get all product registry
     /// </summary>
@@ -144,17 +143,37 @@ interface ThirdAPI
     /// <summary>
     /// Register multiple products
     /// </summary>
-    IEnumerable<ManaLinkRegistry> RegisterProductBatch(string prefix, IEnumerable<string> refid);
+    IEnumerable<ManaLinkRegistry> RegisterProductBatch(string prefix, IEnumerable<string> refids);
     /// <summary>
     /// Register ProductOptions
     /// </summary>
     ProductOptionsRegistry RegisterProductOptions(string serviceId, string mcontentId);
+    /// <summary>
+    /// Create Database
+    /// </summary>
+    /// <param name="databaseName"></param>
+    /// <param name="configurations">
+    /// Specify database options
+    /// - Product collection name
+    /// - autorun id for Product collection 
+    /// - autorun id prefix for Product collection
+    /// - bla..
+    /// </param>
+    /// <returns></returns>
+    DatabaseDetail CreateDatabase(string databaseName, DatabaseConfigurations configurations);
     /// <summary>
     /// 
     /// </summary>
     /// <param name="request"></param>
     void RegisterProductApi(ProductApiRequest request);
 }
+
+//TODO:
+//db for each merchant ? => use merchant id
+//create db when merchant subscribe?
+//- db api seperate => schema (setup) / access data (use)
+//sql ddl ?
+//update schema => old data => version
 
 class ProductRegistry { }
 class ManaLinkRegistry { }
@@ -191,4 +210,3 @@ class ProductOptions { }
 class MContent { }
 
 class RouteParameter { }
-class Response { }
