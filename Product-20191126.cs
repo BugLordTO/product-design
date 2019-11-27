@@ -14,83 +14,105 @@ interface ProductManageAPI
     /// <param name="options">???</param>
     /// <returns>generated id</returns>
     string GenerateId(string prefix, GenerateIdOptions options = null);
-    //#region Query GraphQL implementation
-    ///// <summary>
-    ///// Get single product detail by id
-    ///// </summary>
-    ///// <param name="id">product id</param>
-    ///// <param name="querySyntax">???</param>
-    ///// <returns>product detail</returns>
-    //Product GetProduct(string id, string querySyntax);
-    ///// <summary>
-    ///// Get multiple products detail
-    ///// </summary>
-    ///// <param name="querySyntax">???</param>
-    ///// <returns>list of products detail</returns>
-    //IEnumerable<Product> GetProducts(string querySyntax);
-    //#endregion Query GraphQL implementation
-    ///// <summary>
-    ///// Create product
-    ///// </summary>
-    ///// <param name="product">products detail to create</param>
-    ///// <param name="options">XXX create option eg. auto use runnumber => use pre config</param>
-    ///// <returns></returns>
-    //Response CreateProduct(Product product, CreateDocumentOptions options = null);
-    ///// <summary>
-    ///// Edit product detail
-    ///// </summary>
-    ///// <param name="product">editing product detail</param>
-    ///// <returns></returns>
-    //Response EditProduct(Product product);
-    ///// <summary>
-    ///// Delete product
-    ///// </summary>
-    ///// <param name="id">product id to delete</param>
-    ///// <returns></returns>
-    //Response DeleteProduct(string id);
 
     /// <summary>
-    /// 
+    /// Create Database
     /// </summary>
     /// <param name="databaseName"></param>
-    /// <param name="options"></param>
+    /// <param name="configurations">
+    /// Specify database options
+    /// - Product collection name
+    /// - autorun id for Product collection 
+    /// - autorun id prefix for Product collection
+    /// </param>
     /// <returns></returns>
-    DatabaseDetail InitDatabase(string databaseName, InitDatabaseOptions options);
+    DatabaseDetail CreateDatabase(string databaseName, DatabaseConfigurations configurations);
+    /// <summary>
+    /// Get Database Detail
+    /// </summary>
+    /// <returns>Database Detail</returns>
+    DatabaseDetail GetDatabaseDetail();
+    /// <summary>
+    /// Config Database
+    /// </summary>
+    /// <param name="configurations">
+    /// Specify database options
+    /// - Product database name
+    /// </param>
+    /// <returns>Database Detail</returns>
+    DatabaseDetail ConfigDatabase(DatabaseConfigurations configurations);
+
+    /// <summary>
+    /// Get single collection detail by id
+    /// </summary>
+    /// <param name="collectionId">collection Id</param>
+    /// <param name="id">collection id</param>
+    /// <returns>Collection Detail</returns>
+    CollectionDetail GetCollectionDetail(string collectionId);
+    /// <summary>
+    /// Get multiple collections detail
+    /// </summary>
+    /// <returns>list of collections detail</returns>
+    IEnumerable<CollectionDetail> GetCollectionDetails();
+    /// <summary>
+    /// Create additional collection 
+    /// </summary>
+    /// <param name="collectionName">collection Name</param>
+    /// <param name="configurations">
+    /// Specify Collection Options
+    /// - autorun id
+    /// - autorun id prefix
+    /// </param>
+    /// <returns></returns>
+    Response CreateCollection(string collectionName, CollectionConfigurations configurations);
+    /// <summary>
+    /// Config additional collection
+    /// </summary>
+    /// <param name="collectionId">collection Id</param>
+    /// <param name="configurations">
+    /// Specify Collection Options
+    /// - autorun id
+    /// - autorun id prefix
+    /// </param>
+    /// <returns></returns>
+    Response ConfigCollection(string collectionId, CollectionConfigurations configurations);
+    /// <summary>
+    /// Delete additional collection
+    /// </summary>
+    /// <param name="collectionId">collection id</param>
+    /// <returns></returns>
+    Response DeleteCollection(string collectionId);
+
     /// <summary>
     /// Get single document detail by id
     /// </summary>
     /// <param name="id">document id</param>
     /// <param name="querySyntax">???</param>
     /// <returns>document detail</returns>
-    Product GetDocument(string collectionId, string id, string querySyntax);
+    Document GetDocument(string collectionId, string id, string querySyntax);
     /// <summary>
     /// Get multiple documents detail
     /// </summary>
     /// <param name="querySyntax">???</param>
     /// <returns>list of documents detail</returns>
-    IEnumerable<Product> GetDocument(string collectionId, string querySyntax);
+    IEnumerable<Document> GetDocuments(string collectionId, string querySyntax);
     /// <summary>
-    /// Init additional collection for collect data
-    /// </summary>
-    /// <param name="collectionName">collection name</param>
-    /// <returns>created collection detail</returns>
-    CollectionDetail InitCollection(string collectionName);
-    /// <summary>
-    /// Create additional document to specify collection
+    /// Create document to specify collection
     /// </summary>
     /// <param name="collectionId">collection id</param>
-    /// <param name="document">The document</param>
+    /// <param name="document">Creating document</param>
     /// <returns></returns>
-    Response CreateDocument(string collectionId, Document document, CreateDocumentOptions options = null);
+    Response CreateDocument(string collectionId, Document document);
     /// <summary>
-    /// Edit additional document to specify collection
+    /// Edit document to specify collection
     /// </summary>
     /// <param name="collectionId">collection id</param>
-    /// <param name="document">The document</param>
+    /// <param name="id">document id</param>
+    /// <param name="document">Editing document</param>
     /// <returns></returns>
-    Response EditDocument(string collectionId, Document document);
+    Response EditDocument(string collectionId, string id, Document document);
     /// <summary>
-    /// Delete additional document
+    /// Delete document from specify collection
     /// </summary>
     /// <param name="collectionId">collection id</param>
     /// <param name="id">The document id</param>
@@ -98,9 +120,13 @@ interface ProductManageAPI
     Response DeleteDocument(string collectionId, string id);
 }
 
-//- create db => product collection name, auto run id
-//- create collection => collection name, auto run id
-//- register api
+class GenerateIdOptions { }
+class DatabaseConfigurations { }
+class DatabaseDetail { }
+class CollectionDetail { }
+class CollectionConfigurations { }
+class Document { }
+class CreateDocumentOptions { }
 
 /// <summary>
 /// API สำหรับลงทะเบียน product ให้ mana app เปิดได้
@@ -116,15 +142,24 @@ interface ThirdAPI
     /// </summary>
     ManaLinkRegistry RegisterProduct(string prefix, string refid);
     /// <summary>
+    /// Register multiple products
+    /// </summary>
+    IEnumerable<ManaLinkRegistry> RegisterProductBatch(string prefix, IEnumerable<string> refid);
+    /// <summary>
     /// Register ProductOptions
     /// </summary>
     ProductOptionsRegistry RegisterProductOptions(string serviceId, string mcontentId);
-
-    DBRegistry CreateDB(string prefix,string productCollectionName);
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
     void RegisterProductApi(ProductApiRequest request);
-
 }
+
+class ProductRegistry { }
+class ManaLinkRegistry { }
+class ProductOptionsRegistry { }
+class ProductApiRequest { }
 
 /// <summary>
 /// API ที่ mobile ดึงข้อมูล product ไปแสดง
@@ -151,72 +186,9 @@ interface ManaMobileAPI
     ProductOptions GetProductOptions(string id);
 }
 
-class RouteParameter
-{
+class Product { }
+class ProductOptions { }
+class MContent { }
 
-}
-
-class InitDatabaseOptions
-{
-
-}
-
-class DatabaseDetail
-{
-
-}
-
-class GenerateIdOptions
-{
-
-}
-
-class Product
-{
-
-}
-
-class MContent
-{
-
-}
-
-class CreateDocumentOptions
-{
-
-}
-
-class ProductRegistry
-{
-
-}
-
-class ProductOptionsRegistry
-{
-
-}
-
-class ProductOptions
-{
-
-}
-
-class ManaLinkRegistry
-{
-
-}
-
-class Response
-{
-
-}
-
-class CollectionDetail
-{
-
-}
-
-class Document
-{
-
-}
+class RouteParameter { }
+class Response { }
