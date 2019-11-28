@@ -51,6 +51,7 @@ interface DatabaseManagementAPI
     /// <param name="id">The document id</param>
     /// <returns></returns>
     Response DeleteDocument(string collectionName, string id);
+    //backup whole db
 }
 
 class GenerateIdOptions { }
@@ -172,7 +173,7 @@ interface ThirdAPI
     /// - bla..
     /// </param>
     /// <returns></returns>
-    DatabaseDetail CreateDatabase(string databaseName, DatabaseConfigurations configurations);
+    DatabaseDetail RequestDatabase(string databaseName, DatabaseConfigurations configurations);
     /// <summary>
     /// 
     /// </summary>
