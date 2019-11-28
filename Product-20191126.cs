@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// API สำหรับให้ Dev จัดการ database ที่ mana เก็บให้
+/// จัดการข้อมูลที่ mana เก็บให้
 /// Apply RouteParameter to all API?
 /// </summary>
 interface DatabaseManagementAPI
@@ -15,12 +15,59 @@ interface DatabaseManagementAPI
     /// <returns>generated id</returns>
     string GenerateId(string prefix, GenerateIdOptions options = null);
 
+    /// <summary>
+    /// Get single document detail by id
+    /// </summary>
+    /// <param name="collectionName">collection id</param>
+    /// <param name="id">document id</param>
+    /// <param name="querySyntax">???</param>
+    /// <returns>document detail</returns>
+    Document GetDocument(string collectionName, string id, string querySyntax);
+    /// <summary>
+    /// Get multiple documents detail
+    /// </summary>
+    /// <param name="querySyntax">???</param>
+    /// <returns>list of documents detail</returns>
+    IEnumerable<Document> GetDocuments(string collectionName, string querySyntax);
+    /// <summary>
+    /// Create document to specify collection
+    /// </summary>
+    /// <param name="collectionName">collection id</param>
+    /// <param name="document">Creating document</param>
+    /// <returns></returns>
+    Response CreateDocument(string collectionName, Document document);
+    /// <summary>
+    /// Edit document to specify collection
+    /// </summary>
+    /// <param name="collectionName">collection id</param>
+    /// <param name="id">document id</param>
+    /// <param name="document">Editing document</param>
+    /// <returns></returns>
+    Response EditDocument(string collectionName, string id, Document document);
+    /// <summary>
+    /// Delete document from specify collection
+    /// </summary>
+    /// <param name="collectionName">collection id</param>
+    /// <param name="id">The document id</param>
+    /// <returns></returns>
+    Response DeleteDocument(string collectionName, string id);
+}
+
+class GenerateIdOptions { }
+class Document { }
+
+/// <summary>
+/// API สำหรับให้ Dev จัดการ database schema ที่ mana เก็บให้
+/// Apply RouteParameter to all API?
+/// </summary>
+interface DatabaseSchemaManagementAPI
+{
     //TODO: GetDatabaseDetail, ConfigDatabase จำเป็นต้องมีมั้ย
     /// <summary>
     /// Get Database Detail
     /// </summary>
     /// <returns>Database Detail</returns>
-    DatabaseDetail GetDatabaseDetail();
+    DatabaseDetail GetCurrentDatabaseSchema();
     /// <summary>
     /// Config Database
     /// </summary>
@@ -32,7 +79,9 @@ interface DatabaseManagementAPI
     /// - bla..
     /// </param>
     /// <returns>Database Detail</returns>
-    DatabaseDetail ConfigDatabase(DatabaseConfigurations configurations);
+    DatabaseDetail ConfigCurrentDatabaseSchema(DatabaseConfigurations configurations);
+    Response ApplyToSandboxEnvironment(DatabaseConfigurations configurations);
+    Response ApplyToProductionEnvironment(DatabaseConfigurations configurations);
 
     /// <summary>
     /// Get single collection detail by id
@@ -48,79 +97,42 @@ interface DatabaseManagementAPI
     IEnumerable<CollectionDetail> GetCollectionDetails();
     /// <summary>
     /// Create additional collection 
+    /// - 
     /// </summary>
     /// <param name="collectionName">collection Name</param>
-    /// <param name="configurations">
+    /// <param name="schemas">
     /// Specify Collection Options
     /// - autorun id
     /// - autorun id prefix
     /// </param>
     /// <returns></returns>
-    Response CreateCollection(string collectionName, CollectionConfigurations configurations);
+    Response CreateCollection(string collectionName, CollectionSchemas schemas);
     /// <summary>
     /// Config additional collection
     /// </summary>
     /// <param name="collectionId">collection Id</param>
-    /// <param name="configurations">
+    /// <param name="schemas">
     /// Specify Collection Options
     /// - autorun id
     /// - autorun id prefix
     /// </param>
     /// <returns></returns>
-    Response ConfigCollection(string collectionId, CollectionConfigurations configurations);
+    Response ConfigCollection(string collectionId, CollectionSchemas schemas);
     /// <summary>
     /// Delete additional collection
     /// </summary>
     /// <param name="collectionId">collection id</param>
     /// <returns></returns>
     Response DeleteCollection(string collectionId);
-
-    /// <summary>
-    /// Get single document detail by id
-    /// </summary>
-    /// <param name="collectionId">collection id</param>
-    /// <param name="id">document id</param>
-    /// <param name="querySyntax">???</param>
-    /// <returns>document detail</returns>
-    Document GetDocument(string collectionId, string id, string querySyntax);
-    /// <summary>
-    /// Get multiple documents detail
-    /// </summary>
-    /// <param name="querySyntax">???</param>
-    /// <returns>list of documents detail</returns>
-    IEnumerable<Document> GetDocuments(string collectionId, string querySyntax);
-    /// <summary>
-    /// Create document to specify collection
-    /// </summary>
-    /// <param name="collectionId">collection id</param>
-    /// <param name="document">Creating document</param>
-    /// <returns></returns>
-    Response CreateDocument(string collectionId, Document document);
-    /// <summary>
-    /// Edit document to specify collection
-    /// </summary>
-    /// <param name="collectionId">collection id</param>
-    /// <param name="id">document id</param>
-    /// <param name="document">Editing document</param>
-    /// <returns></returns>
-    Response EditDocument(string collectionId, string id, Document document);
-    /// <summary>
-    /// Delete document from specify collection
-    /// </summary>
-    /// <param name="collectionId">collection id</param>
-    /// <param name="id">The document id</param>
-    /// <returns></returns>
-    Response DeleteDocument(string collectionId, string id);
+    IEnumerable<CollectionMappings> GetCollectionMappings();
+    Response SetupCollectionMappings(IEnumerable<CollectionMappings> mappings);
 }
 
-class GenerateIdOptions { }
-class DatabaseConfigurations { }
 class DatabaseDetail { }
+class DatabaseConfigurations { }
 class CollectionDetail { }
-class CollectionConfigurations { }
-class Document { }
-class CreateDocumentOptions { }
-class Response { }
+class CollectionSchemas { }
+class CollectionMappings { }
 
 /// <summary>
 /// API สำหรับลงทะเบียน product ให้ mana app เปิดได้
@@ -203,6 +215,7 @@ interface ManaMobileAPI
     /// <param name="id">product id</param>
     /// <returns></returns>
     ProductOptions GetProductOptions(string id);
+    //merchant subscribe service
 }
 
 class Product { }
@@ -210,3 +223,4 @@ class ProductOptions { }
 class MContent { }
 
 class RouteParameter { }
+class Response { }
