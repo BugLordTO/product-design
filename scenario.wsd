@@ -1,0 +1,57 @@
+Dev
+	- Scenario: Create database schema
+		- ThirdAPI.RequestDatabase()
+		- DatabaseSchemaManagementAPI.CreateCollection()
+		- DatabaseSchemaManagementAPI.ApplyToSandboxEnvironment()
+		- DatabaseSchemaManagementAPI.ApplyToProductionEnvironment()
+	- Scenario: Change database schema
+		- DatabaseSchemaManagementAPI.CreateCollection()
+		- DatabaseSchemaManagementAPI.ConfigCollection()
+		- DatabaseSchemaManagementAPI.DeleteCollection()
+		- DatabaseSchemaManagementAPI.SetupCollectionMappings()
+		- DatabaseSchemaManagementAPI.ApplyToSandboxEnvironment()
+		- DatabaseSchemaManagementAPI.ApplyToProductionEnvironment()
+	- Scenario: Prepare product api
+		- ThirdAPI.RegisterProductApi()
+
+Merchant
+	- Scenario: Merchant subscribe service
+		- ManaMobileAPI.SubscribeService()
+		- ManaSystem => Create Database by setup schema
+		- ManaSystem => Hook to Dev
+		- Dev => Init database data
+			- DatabaseManagementAPI.CreateDocument()
+
+	- Scenario: Create product data
+		- DatabaseManagementAPI.CreateDocument()
+
+	- Scenario: Register product to mana
+		- ThirdAPI.RegisterProduct()
+		- ThirdAPI.RegisterProductOptions()
+		* CollectibleOptions
+
+User
+	- Scenario: User scan QR
+		- Visit()
+		- FormController.GetMContent()
+		- ManaMobileAPI.GetProductMContent()
+		- FormController.GetData()
+		- ManaMobileAPI.GetProduct()
+		- ManaMobileAPI.GetProductOptions()
+
+	- Scenario: User add product to cart
+		- FormController.Submit()
+		* Cart scenario
+		- ProductHook()
+		- CartHook()
+
+	- Scenario: User checkout
+		- TakeAction()
+		- OrderHook()
+
+	- Scenario: User pay
+		- TakeAction()
+		- PaymentHook()
+
+***Grant db for another service
+***Who is db owner? merchant or service or both
