@@ -4,6 +4,7 @@ Dev
 		- DatabaseSchemaManagementAPI.CreateCollection()
 		- DatabaseSchemaManagementAPI.ApplyToSandboxEnvironment()
 		- DatabaseSchemaManagementAPI.ApplyToProductionEnvironment()
+	// แตก scenario ให้ละเอียด
 	- Scenario: Change database schema
 		- DatabaseSchemaManagementAPI.CreateCollection()
 		- DatabaseSchemaManagementAPI.ConfigCollection()
@@ -11,6 +12,7 @@ Dev
 		- DatabaseSchemaManagementAPI.SetupCollectionMappings()
 		- DatabaseSchemaManagementAPI.ApplyToSandboxEnvironment()
 		- DatabaseSchemaManagementAPI.ApplyToProductionEnvironment()
+	// external must reg api ? / internal only create db ?
 	- Scenario: Prepare product api
 		- ThirdAPI.RegisterProductApi()
 
@@ -31,12 +33,13 @@ Merchant
 	- Scenario: Register product to mana
 		* ThirdAPI.RegisterMContent()
 		* ThirdAPI.RegisterOptionMContent()
-		* ThirdAPI.MappingOptionMContent()
+		* ThirdAPI.MappingOptionMContent() ???
 		- ThirdAPI.RegisterProduct()
 		{ 
 			name: shoes,
 			mcontentUrl: ManaMobileAPI.GetProductMContent(),
 			dataHookUrl: ManaMobileAPI.GetProduct()
+			// กำหนดทีเดียวใช้ได้หลาย product
 			options:[
 				{ optionMContentId: "mct123", dataHookUrl: "" }
 				{ optionMContentId: "mct456", dataHookUrl: "" }
@@ -47,7 +50,7 @@ Merchant
 
 User
 	- Scenario: User scan QR
-		- Visit()
+		* Visit()
 		* FormController.GetMContent()
 			- ManaMobileAPI.GetProductMContent()
 		* FormController.GetData()
@@ -55,19 +58,19 @@ User
 		* ManaMobileAPI.GetOptionMContent()
 			- ?????
 
+	***** Cart scenario => ลงรายละเอียดไปจนถึงตอนดึงข้อมูล
 	- Scenario: User add product to cart
 		* FormController.Submit()
-		* Cart scenario
-		- ProductHook()
-		- CartHook()
+		* ProductHook()
+		* CartHook()
 
 	- Scenario: User checkout
 		* TakeAction()
-		- OrderHook()
+		* OrderHook()
 
 	- Scenario: User pay
 		* TakeAction()
-		- PaymentHook()
+		* PaymentHook()
 
-***Grant db for another service
-***Who is db owner? merchant or service or both
+*** Grant db for another service
+*** Who is db owner? merchant or service or both
