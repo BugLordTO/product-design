@@ -16,41 +16,57 @@ Dev
 
 Merchant
 	- Scenario: Merchant subscribe service
-		- ManaMobileAPI.SubscribeService()
-		- ManaSystem => Create Database by setup schema
-		- ManaSystem => Hook to Dev
+		* ManaMobileAPI.SubscribeService()
+			- ManaSystem => Create Database by schema
+			- ManaSystem => Hook to Dev
 		- Dev => Init database data
 			- DatabaseManagementAPI.CreateDocument()
 
 	- Scenario: Create product data
+		[Product]
+		- DatabaseManagementAPI.CreateDocument()
+		[Options]
 		- DatabaseManagementAPI.CreateDocument()
 
 	- Scenario: Register product to mana
+		* ThirdAPI.RegisterMContent()
+		* ThirdAPI.RegisterOptionMContent()
+		* ThirdAPI.MappingOptionMContent()
 		- ThirdAPI.RegisterProduct()
-		- ThirdAPI.RegisterProductOptions()
-		* CollectibleOptions
+		{ 
+			name: shoes,
+			mcontentUrl: ManaMobileAPI.GetProductMContent(),
+			dataHookUrl: ManaMobileAPI.GetProduct()
+			options:[
+				{ optionMContentId: "mct123", dataHookUrl: "" }
+				{ optionMContentId: "mct456", dataHookUrl: "" }
+			]
+		}
+		* Register CollectibleOptions
+		***** how to use mcontent option? *****
 
 User
 	- Scenario: User scan QR
 		- Visit()
-		- FormController.GetMContent()
-		- ManaMobileAPI.GetProductMContent()
-		- FormController.GetData()
-		- ManaMobileAPI.GetProduct()
-		- ManaMobileAPI.GetProductOptions()
+		* FormController.GetMContent()
+			- ManaMobileAPI.GetProductMContent()
+		* FormController.GetData()
+			- ManaMobileAPI.GetProduct()
+		* ManaMobileAPI.GetOptionMContent()
+			- ?????
 
 	- Scenario: User add product to cart
-		- FormController.Submit()
+		* FormController.Submit()
 		* Cart scenario
 		- ProductHook()
 		- CartHook()
 
 	- Scenario: User checkout
-		- TakeAction()
+		* TakeAction()
 		- OrderHook()
 
 	- Scenario: User pay
-		- TakeAction()
+		* TakeAction()
 		- PaymentHook()
 
 ***Grant db for another service
