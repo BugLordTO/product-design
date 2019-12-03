@@ -1,19 +1,75 @@
 Dev
-	- Scenario: Create database schema
+	- Scenario: Request Database
 		- ThirdAPI.RequestDatabase()
-		- DatabaseSchemaManagementAPI.CreateCollection()
-		- DatabaseSchemaManagementAPI.ApplyToSandboxEnvironment()
-		- DatabaseSchemaManagementAPI.ApplyToProductionEnvironment()
-	// แตก scenario ให้ละเอียด
+		{
+			databasename: "promome"
+			productCollectionname: "Product",
+		}
+
+	- Scenario: Create database schema => example [product option], [shop table], [order]
+		- DatabaseSchemaManagementAPI.CreateCollection("ProductOption")
+		{ fields: [
+			{"key":"string"},
+			{"values":"string[]"}
+		]}
+		- DatabaseSchemaManagementAPI.CreateCollection("ShopTable")
+		{ fields: [
+			{"tableName":"string"}
+		]}
+		- DatabaseSchemaManagementAPI.CreateCollection("order")
+		{ fields: [
+			{"userDisplayname":"string"},
+			{"createdDate":"DateTime"}
+		]}
+		- DatabaseSchemaManagementAPI.CreateCollection("OpenShop")
+		{ fields: [
+			{"openDate":"DateTime"}
+		]}
+
+	- scenario: Deploy schema to sandbox for test with dev merchant
+		- DatabaseSchemaManagementAPI.DeployToSandboxEnvironment()
+
+	- scenario: Create dev merchant on sandbox
+		* ThirdAPISandbox.RegisterMContent()
+		* ThirdAPISandbox.RegisterOptionMContent()
+		* ThirdAPISandbox.MappingOptionMContent() ???
+		* ThirdAPISandbox.CreateDevMerchant()
+		* ManaMobileAPISandbox.SubscribeService()
+		- DatabaseManagementAPISandbox.CreateDocument() // create product data
+		- ThirdAPISandbox.RegisterProduct()
+		* ... cart scenario on sandbox ...
+
 	- Scenario: Change database schema
-		- DatabaseSchemaManagementAPI.CreateCollection()
-		- DatabaseSchemaManagementAPI.ConfigCollection()
-		- DatabaseSchemaManagementAPI.DeleteCollection()
-		- DatabaseSchemaManagementAPI.SetupCollectionMappings()
-		- DatabaseSchemaManagementAPI.ApplyToSandboxEnvironment()
-		- DatabaseSchemaManagementAPI.ApplyToProductionEnvironment()
-	// external must reg api ? / internal only create db ?
-	- Scenario: Prepare product api
+		- DatabaseSchemaManagementAPI.CreateCollection("bill")
+		{ fields: [
+			{"billid":"string"},
+			{"createdDate":"DateTime"}
+		]}
+		- DatabaseSchemaManagementAPI.ConfigCollection("order")
+		{ fields: [
+			{"userDisplayname":"string"},
+			{"orderDate":"DateTime"}
+			{"finishDate":"DateTime"}
+		]}
+		- DatabaseSchemaManagementAPI.DeleteCollection("OpenShop")
+		- DatabaseSchemaManagementAPI.SetupCollectionMappings("order")
+		{ mapFields: [
+			{
+				"oldFieldName":"createdDate",
+				"newFieldName":"orderDate"
+			}
+		]}
+		- DatabaseSchemaManagementAPI.DeployToSandboxEnvironment()
+
+	- scenario: Deploy schema to production
+		- DatabaseSchemaManagementAPI.DeployToProductionEnvironment()
+		
+	- Scenario: prepare product mcontent
+		* ThirdAPI.RegisterMContent()
+		* ThirdAPI.RegisterOptionMContent()
+		* ThirdAPI.MappingOptionMContent() ???
+
+	- Scenario: External product prepare product api
 		- ThirdAPI.RegisterProductApi()
 
 Merchant
@@ -21,7 +77,7 @@ Merchant
 		* ManaMobileAPI.SubscribeService()
 			- ManaSystem => Create Database by schema
 			- ManaSystem => Hook to Dev
-		- Dev => Init database data
+		- Service => Init database data
 			- DatabaseManagementAPI.CreateDocument()
 
 	- Scenario: Create product data
@@ -31,15 +87,12 @@ Merchant
 		- DatabaseManagementAPI.CreateDocument()
 
 	- Scenario: Register product to mana
-		* ThirdAPI.RegisterMContent()
-		* ThirdAPI.RegisterOptionMContent()
-		* ThirdAPI.MappingOptionMContent() ???
 		- ThirdAPI.RegisterProduct()
 		{ 
 			name: shoes,
 			mcontentUrl: ManaMobileAPI.GetProductMContent(),
-			dataHookUrl: ManaMobileAPI.GetProduct()
-			// กำหนดทีเดียวใช้ได้หลาย product
+			dataHookUrl: ManaMobileAPI.GetProduct(),
+			// กำหนดทีเดียวใช้ได้หลาย product ???
 			options:[
 				{ optionMContentId: "mct123", dataHookUrl: "" }
 				{ optionMContentId: "mct456", dataHookUrl: "" }
@@ -49,7 +102,7 @@ Merchant
 		***** how to use mcontent option? *****
 
 User
-	- Scenario: User scan QR
+	- Scenario: User scan product QR
 		* Visit()
 		* FormController.GetMContent()
 			- ManaMobileAPI.GetProductMContent()
@@ -59,18 +112,24 @@ User
 			- ?????
 
 	***** Cart scenario => ลงรายละเอียดไปจนถึงตอนดึงข้อมูล
-	- Scenario: User add product to cart
-		* FormController.Submit()
-		* ProductHook()
+	* FormController.Submit()
+	
+	- Scenario: User add coupon to cart
 		* CartHook()
+			ThirdAPI.GetCoupon()  			
+		
+	- Scenario: User add product to cart
+		* ProductHook()
+			DatabaseManagementAPI.GetDocument()  			
+		* CartHook()
+			DatabaseManagementAPI.GetDocument() : Check stock	
 
 	- Scenario: User checkout
 		* TakeAction()
 		* OrderHook()
+			DatabaseManagementAPI.EditDocument() : Check stock
 
 	- Scenario: User pay
 		* TakeAction()
 		* PaymentHook()
 
-*** Grant db for another service
-*** Who is db owner? merchant or service or both

@@ -81,8 +81,8 @@ interface DatabaseSchemaManagementAPI
     /// </param>
     /// <returns>Database Detail</returns>
     DatabaseDetail ConfigCurrentDatabaseSchema(DatabaseConfigurations configurations);
-    Response ApplyToSandboxEnvironment(DatabaseConfigurations configurations);
-    Response ApplyToProductionEnvironment(DatabaseConfigurations configurations);
+    Response DeployToSandboxEnvironment(DatabaseConfigurations configurations);
+    Response DeployToProductionEnvironment(DatabaseConfigurations configurations);
 
     /// <summary>
     /// Get single collection detail by id
