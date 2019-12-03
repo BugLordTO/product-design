@@ -60,6 +60,7 @@ Dev
 			}
 		]}
 		- DatabaseSchemaManagementAPI.DeployToSandboxEnvironment()
+		* ... cart scenario on sandbox again ...
 
 	- scenario: Deploy schema to production
 		- DatabaseSchemaManagementAPI.DeployToProductionEnvironment()
@@ -120,16 +121,18 @@ User
 		
 	- Scenario: User add product to cart
 		* ProductHook()
-			DatabaseManagementAPI.GetDocument()  			
+			DatabaseManagementAPI.GetDocument("stock", productid)  			
 		* CartHook()
-			DatabaseManagementAPI.GetDocument() : Check stock	
+			DatabaseManagementAPI.GetDocument("stock", productids) : Check stock	
 
 	- Scenario: User checkout
 		* TakeAction()
 		* OrderHook()
-			DatabaseManagementAPI.EditDocument() : Check stock
+			DatabaseManagementAPI.EditDocument("stock", productid) : Check stock
 
 	- Scenario: User pay
 		* TakeAction()
 		* PaymentHook()
 
+*** comment ***
+- ตอนแก้ schema ?
