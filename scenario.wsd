@@ -108,6 +108,24 @@ Merchant
 				{ optionMContentId: "mct456", dataHookUrl: "https://web.com/api/size/{productid}" }
 			]
 		}
+		{ // แบบ 4
+			id: pro123
+			name: shoes,
+			mcontentUrl: ManaMobileAPI.GetProductMContent(),
+			dataHookUrl: ManaMobileAPI.GetProduct(),
+			options:[
+				{"color":["red","green","blue"]}
+				{"size":["s","m","l"]}
+			],
+			optionPrices:[
+				{id:"pro123", color:"red", size:"s", price:5},
+				{id:"pro123", color:"green", size:"s", price:7},
+				{id:"pro123", color:"blue", size:"s", price:10},
+				{id:"pro124", color:"red", size:"m", price:5},
+				{id:"pro125", color:"green", size:"m", price:20},
+				{id:"pro126", color:"blue", size:"m", price:2},
+			],
+		}
 		* Register CollectibleOptions
 		***** how to use mcontent option? *****
 
@@ -144,4 +162,6 @@ User
 		* PaymentHook()
 
 *** comment ***
-- ตอนแก้ schema ?
+- manage db hook อะไรบ้าง ทำงานยังไง
+- hook อื่นๆ อะไรบ้าง ทำงานยังไง
+- only req / req+res
