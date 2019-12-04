@@ -6,30 +6,16 @@ Dev
 			productCollectionname: "Product",
 		}
 
-	- Scenario: Create database schema => example [product option], [shop table], [order]
+	- Scenario: Create database schema => example [product option], [shop table], [order], [OpenShop]
 		- DatabaseSchemaManagementAPI.CreateCollection("ProductOption")
-		{ fields: [
-			{"key":"string"},
-			{"values":"string[]"}
-		]}
 		- DatabaseSchemaManagementAPI.CreateCollection("ShopTable")
-		{ fields: [
-			{"tableName":"string"}
-		]}
 		- DatabaseSchemaManagementAPI.CreateCollection("order")
-		{ fields: [
-			{"userDisplayname":"string"},
-			{"createdDate":"DateTime"}
-		]}
 		- DatabaseSchemaManagementAPI.CreateCollection("OpenShop")
-		{ fields: [
-			{"openDate":"DateTime"}
-		]}
 
 	- scenario: Deploy schema to sandbox for test with dev merchant
 		- DatabaseSchemaManagementAPI.DeployToSandboxEnvironment()
 
-	- scenario: Create dev merchant on sandbox
+	- scenario: Create dev merchant on sandbox and test
 		* ThirdAPISandbox.RegisterMContent()
 		* ThirdAPISandbox.RegisterOptionMContent()
 		* ThirdAPISandbox.MappingOptionMContent() ???
@@ -41,24 +27,7 @@ Dev
 
 	- Scenario: Change database schema
 		- DatabaseSchemaManagementAPI.CreateCollection("bill")
-		{ fields: [
-			{"billid":"string"},
-			{"createdDate":"DateTime"}
-		]}
-		- DatabaseSchemaManagementAPI.ConfigCollection("order")
-		{ fields: [
-			{"userDisplayname":"string"},
-			{"orderDate":"DateTime"}
-			{"finishDate":"DateTime"}
-		]}
-		- DatabaseSchemaManagementAPI.DeleteCollection("OpenShop")
-		- DatabaseSchemaManagementAPI.SetupCollectionMappings("order")
-		{ mapFields: [
-			{
-				"oldFieldName":"createdDate",
-				"newFieldName":"orderDate"
-			}
-		]}
+		- DatabaseSchemaManagementAPI.DropCollection("OpenShop")
 		- DatabaseSchemaManagementAPI.DeployToSandboxEnvironment()
 		* ... cart scenario on sandbox again ...
 
@@ -89,14 +58,54 @@ Merchant
 
 	- Scenario: Register product to mana
 		- ThirdAPI.RegisterProduct()
-		{ 
+		{ // optionMContent แสดงข้อมูลได้แบบเดียว จาก options ที่กำหนดมาใน product
+			id: pro123
 			name: shoes,
 			mcontentUrl: ManaMobileAPI.GetProductMContent(),
 			dataHookUrl: ManaMobileAPI.GetProduct(),
-			// กำหนดทีเดียวใช้ได้หลาย product ???
 			options:[
-				{ optionMContentId: "mct123", dataHookUrl: "" }
-				{ optionMContentId: "mct456", dataHookUrl: "" }
+				{"color":["red","green","blue"]}
+				{"size":["s","m","l"]}
+			],
+			[
+				{ optionMContentId: "mct123", optionId: "color" }
+				{ optionMContentId: "mct456", optionId: "size" }
+			]
+		}
+		{ // optionMContent ใช้ข้อมูลจาก product เลย
+			id: pro123
+			name: shoes,
+			mcontentUrl: ManaMobileAPI.GetProductMContent(),
+			dataHookUrl: ManaMobileAPI.GetProduct(),
+			options:[
+				{"color":["red","green","blue"]}
+				{"size":["s","m","l"]}
+			],
+			stocks:[
+				{"red","s", 5},
+				{"green","s", 7},
+				{"blue","s", 10},
+				{"red","m", 5},
+				{"green","m", 0},
+				{"blue","m", 2},
+				{"red","l", 1},
+				{"green","l", 9},
+				{"blue","l", 0},
+			],
+			[
+				{ optionMContentId: "mct123" }
+				{ optionMContentId: "mct456" }
+				{ optionMContentId: "mana-option-select-sddress" }
+			]
+		}
+		{  // optionMContent แสดงข้อมูลจาก api dataHookUrl
+			id: pro123
+			name: shoes,
+			mcontentUrl: ManaMobileAPI.GetProductMContent(),
+			dataHookUrl: ManaMobileAPI.GetProduct(),
+			[
+				{ optionMContentId: "mct123", dataHookUrl: "https://web.com/api/color/{productid}" }
+				{ optionMContentId: "mct456", dataHookUrl: "https://web.com/api/size/{productid}" }
 			]
 		}
 		* Register CollectibleOptions

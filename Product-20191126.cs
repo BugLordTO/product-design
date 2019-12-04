@@ -124,7 +124,7 @@ interface DatabaseSchemaManagementAPI
     /// </summary>
     /// <param name="collectionId">collection id</param>
     /// <returns></returns>
-    Response DeleteCollection(string collectionId);
+    Response DropCollection(string collectionId);
     IEnumerable<CollectionMappings> GetCollectionMappings();
     Response SetupCollectionMappings(IEnumerable<CollectionMappings> mappings);
 }
