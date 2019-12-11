@@ -12,10 +12,13 @@ Dev
 		- DatabaseSchemaManagementAPI.CreateCollection("order")
 		- DatabaseSchemaManagementAPI.CreateCollection("OpenShop")
 
+		***schemaname for reference to collections
+
 	- scenario: Deploy schema to sandbox for test with dev merchant
-		- DatabaseSchemaManagementAPI.DeployToSandboxEnvironment()
+		- DatabaseSchemaManagementAPI.DeployToSandboxEnvironment(schemaname)
 
 	- scenario: Create dev merchant on sandbox and test
+		*** ควรแยก environment หรือไม่
 		* ThirdAPISandbox.RegisterMContent()
 		* ThirdAPISandbox.RegisterOptionMContent()
 		* ThirdAPISandbox.MappingOptionMContent() ???
@@ -33,6 +36,7 @@ Dev
 
 	- scenario: Deploy schema to production
 		- DatabaseSchemaManagementAPI.DeployToProductionEnvironment()
+
 		
 	- Scenario: prepare product mcontent
 		* ThirdAPI.RegisterMContent()
@@ -49,6 +53,7 @@ Merchant
 			- ManaSystem => Hook to Dev
 		- Service => Init database data
 			- DatabaseManagementAPI.CreateDocument()
+		- Service => ThirdAPI.ApproveSubscription() / ThirdAPI.DeclineSubscription()
 
 	- Scenario: Create product data
 		[Product]
@@ -58,56 +63,6 @@ Merchant
 
 	- Scenario: Register product to mana
 		- ThirdAPI.RegisterProduct()
-		{ // optionMContent แสดงข้อมูลได้แบบเดียว จาก options ที่กำหนดมาใน product
-			id: pro123
-			name: shoes,
-			mcontentUrl: ManaMobileAPI.GetProductMContent(),
-			dataHookUrl: ManaMobileAPI.GetProduct(),
-			options:[
-				{"color":["red","green","blue"]}
-				{"size":["s","m","l"]}
-			],
-			[
-				{ optionMContentId: "mct123", optionId: "color" }
-				{ optionMContentId: "mct456", optionId: "size" }
-			]
-		}
-		{ // optionMContent ใช้ข้อมูลจาก product เลย
-			id: pro123
-			name: shoes,
-			mcontentUrl: ManaMobileAPI.GetProductMContent(),
-			dataHookUrl: ManaMobileAPI.GetProduct(),
-			options:[
-				{"color":["red","green","blue"]}
-				{"size":["s","m","l"]}
-			],
-			stocks:[
-				{"red","s", 5},
-				{"green","s", 7},
-				{"blue","s", 10},
-				{"red","m", 5},
-				{"green","m", 0},
-				{"blue","m", 2},
-				{"red","l", 1},
-				{"green","l", 9},
-				{"blue","l", 0},
-			],
-			[
-				{ optionMContentId: "mct123" }
-				{ optionMContentId: "mct456" }
-				{ optionMContentId: "mana-option-select-sddress" }
-			]
-		}
-		{  // optionMContent แสดงข้อมูลจาก api dataHookUrl
-			id: pro123
-			name: shoes,
-			mcontentUrl: ManaMobileAPI.GetProductMContent(),
-			dataHookUrl: ManaMobileAPI.GetProduct(),
-			[
-				{ optionMContentId: "mct123", dataHookUrl: "https://web.com/api/color/{productid}" }
-				{ optionMContentId: "mct456", dataHookUrl: "https://web.com/api/size/{productid}" }
-			]
-		}
 		{ // แบบ 4
 			id: pro123
 			name: shoes,
@@ -126,6 +81,8 @@ Merchant
 				{id:"pro126", color:"blue", size:"m", price:2},
 			],
 		}
+		* ไม่ต้องเอาเรื่อง stock มาเกี่ยวในขั้นตอนนี้
+
 		* Register CollectibleOptions
 		***** how to use mcontent option? *****
 
@@ -161,7 +118,13 @@ User
 		* TakeAction()
 		* PaymentHook()
 
-*** comment ***
-- manage db hook อะไรบ้าง ทำงานยังไง
-- hook อื่นๆ อะไรบ้าง ทำงานยังไง
-- only req / req+res
+
+
+ตั้งแต่ dev เริ่ม register 
+    - ต้องมี hook อะไรบ้าง ?
+create DB ใส่ schema ด้วยเลย ?
+
+ร้าน subscribe รอ processing
+หลังร้าน subscribe ต้องส่ง url หรือบางอย่างให้ร้านจัดการ เช่น mcontent urlmanage
+
+

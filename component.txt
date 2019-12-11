@@ -1,0 +1,53 @@
+@startuml
+
+package "mana mobile Api" {
+    package "production" {
+        [MContentApi]
+        database manaDb
+    }
+    package "sandbox" {
+        [MContentSandboxApi]
+        database manaSandboxDb
+    }
+}
+
+package "Api for 3rd" {
+    [DbSchemaApi]
+    [DevApi]
+    package "3rd production" {
+        [DbApi]
+        [3rdApi]
+        database productionDb
+    }
+    package "3rd sandbox" {
+        [DbApi sandbox]
+        [3rdApi sandbox]
+        database sandboxDb
+    }
+}
+
+package "external Api" {
+    package externalProduction
+    package externalDev
+    [ProductExternalApi]
+    database productExternalDb
+}
+
+[DevApi] --> manaDb
+[DevApi] --> manaSandboxDb
+
+[MContentApi] --> manaDb
+[MContentSandboxApi] --> manaSandboxDb
+
+
+[DbApi] -down-> productionDb
+[3rdApi] -down-> productionDb
+
+[DbApi sandbox] -up-> sandboxDb
+[3rdApi sandbox] -up-> sandboxDb
+
+[DbSchemaApi] -down-> sandboxDb
+
+[DbSchemaApi] -up-> productionDb
+
+@enduml

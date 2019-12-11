@@ -1,0 +1,158 @@
+@startuml manage-db
+title create db schema and deploy to sandbox
+
+actor devMerchant
+actor dev
+participant "db Schama Api" as dbSchamaApi
+participant "db API Sandbox" as dbApi
+participant "mana 3rd Api Sandbox" as 3rd
+participant "mana Api Sandbox" as manaapi
+
+group dev register service
+dev -> 3rd : RegisterService()
+dev <-- 3rd : ServiceRegistryInfo
+dev -> 3rd : RegisterSubscribeHook()
+dev <-- 3rd 
+dev -> 3rd : RegisterPaymentHook()
+dev <-- 3rd 
+alt enable product 
+dev -> 3rd : EnableProductFeature(HookRequest)
+dev <- 3rd 
+note right
+    { 
+        Hook : "https://service.com/api/ProductHook",
+        Hook : "https://service.com/api/CartHook",
+        Hook : "https://service.com/api/CartResolutionHook",
+        Hook : "https://service.com/api/OrderHook", 
+    }
+end note
+end
+alt enable coupon 
+dev -> 3rd : EnableCouponFeature(HookRequest)
+dev <- 3rd 
+note right
+    { 
+        Hook : "https://service.com/api/ReceiveEslipHook",
+        Hook : "https://service.com/api/UseEslipHook", 
+    }
+end note
+end
+alt enable membership 
+dev -> 3rd : EnableMembershipFeature(HookRequest)
+dev <- 3rd 
+note right
+    { 
+        Hook : "https://service.com/api/SignupHook",
+        Hook : "https://service.com/api/ResignHook",
+    }
+end note
+end
+alt enable payback 
+dev -> 3rd : EnablePaybackFeature(HookRequest)
+dev <- 3rd 
+note right
+    { 
+        Hook : "https://service.com/api/PaybackHook",
+    }
+end note
+end
+alt enable delivery 
+dev -> 3rd : EnableDeliveryFeature(HookRequest)
+dev <- 3rd 
+end
+end
+
+group create database collection and deloy to sandbox
+    dev -> dbSchamaApi : DeployToSandboxEnvironment(Schemas)
+    activate dev
+    activate dbSchamaApi
+    dev <-- dbSchamaApi : HOOK Notify success [Deploy to Sandbox Environment]
+    deactivate dev
+    deactivate dbSchamaApi
+end
+
+note right
+    { 
+        Schemas : {
+            DatabaseName : "??????",
+            ProductionCollectionName : "Product",
+            CollectionNames : [
+                "ProductOption",
+                "ShopTable",
+                "order",
+                "OpenShop",
+            ]
+        }
+    }
+end note
+
+group register mcontent and dev merchant
+
+dev -> 3rd : RegisterMContent()
+activate dev
+activate 3rd
+dev <-- 3rd : 
+deactivate 3rd
+dev -> 3rd : RegisterOptionMContent()
+activate 3rd
+dev <-- 3rd : 
+deactivate 3rd
+dev -> 3rd : MappingOptionMContent()
+activate 3rd
+dev <-- 3rd : 
+deactivate 3rd
+dev -> 3rd : CreateDevMerchant()
+activate 3rd
+dev <-- 3rd : DevMerchantDetail
+deactivate 3rd
+deactivate dev
+
+end
+
+group test dev merchant Subscribe Service
+
+devMerchant -> manaapi : SubscribeService() 
+activate devMerchant
+activate manaapi
+devMerchant <-- manaapi : response result progressing
+manaapi -> manaapi : create collection\nfor merchant by sandbox\nschema environment
+manaapi -> dev : HOOK notify some merchant subscribe they service
+activate dev
+alt Auto Verify = off
+dev -> dbApi : DatabaseManagementAPISandbox.CreateDocument()
+activate dbApi
+dev <-- dbApi : 
+deactivate dbApi
+dev -> 3rd : DatabaseManagementAPISandbox.ApproveSubscription()
+activate 3rd
+dev <-- 3rd : 
+deactivate dev
+devMerchant <-- 3rd : notify subscribed (endpoint or url of backend for manage merchant data)
+deactivate 3rd
+else Auto Verify = on
+devMerchant <-- manaapi : notify subscribed (endpoint or url of backend for manage merchant data)
+deactivate devMerchant
+deactivate manaapi
+end
+
+end
+
+group test dev merchant create product
+
+devMerchant -> dev : create product
+activate devMerchant
+activate dev
+dev -> dbApi : DatabaseManagementAPISandbox.CreateDocument()
+activate dbApi
+dev <-- dbApi : 
+deactivate dbApi
+dev -> 3rd : ThirdAPISandbox.RegisterProduct()
+activate 3rd
+dev <-- 3rd : ManaLinkRegistry
+deactivate 3rd
+devMerchant <-- dev : ManaLinkRegistry
+deactivate dev
+deactivate devMerchant
+
+end
+@enduml
