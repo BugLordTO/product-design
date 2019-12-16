@@ -109,17 +109,20 @@ deactivate dev
 
 end
 
+newpage test dev activity
+
 group test dev merchant Subscribe Service
 
 devMerchant -> manaapi : SubscribeService() 
 activate devMerchant
 activate manaapi
 devMerchant <-- manaapi : response result progressing
+deactivate devMerchant
 manaapi -> manaapi : create collection\nfor merchant by sandbox\nschema environment
 manaapi -> dev : HOOK notify some merchant subscribe they service
 activate dev
 alt Auto Verify = off
-dev -> dbApi : DatabaseManagementAPISandbox.CreateDocument()
+dev -> dbApi : DatabaseManagementAPISandbox.CreateDocument() // init data for merchant
 activate dbApi
 dev <-- dbApi : 
 deactivate dbApi
@@ -128,23 +131,47 @@ activate 3rd
 dev <-- 3rd : 
 deactivate dev
 devMerchant <-- 3rd : notify subscribed (endpoint or url of backend for manage merchant data)
+activate devMerchant
+deactivate devMerchant
 deactivate 3rd
 else Auto Verify = on
 devMerchant <-- manaapi : notify subscribed (endpoint or url of backend for manage merchant data)
+activate devMerchant
 deactivate devMerchant
 deactivate manaapi
 end
 
 end
 
-group test dev merchant create product
+group test dev merchant create product and register product endpoint
 
 devMerchant -> dev : create product
 activate devMerchant
 activate dev
-dev -> dbApi : DatabaseManagementAPISandbox.CreateDocument()
+dev -> dbApi : DatabaseManagementAPISandbox.CreateDocument(JToken product)
 activate dbApi
-dev <-- dbApi : 
+dbApi -> dbApi : Validate base class schema (ManaProduct) 
+note right    
+    e.g. 
+        public class BaseProduct
+        {
+            [JsonProperty("_id", Required = Required.Always)]
+            public string _id { get; set; }
+
+            [JsonProperty("name", Required = Required.Always)]
+            public string Name { get; set; }
+
+            [JsonProperty("url", Required = Required.Always)]
+            public string Url { get; set; }
+
+            [JsonProperty("description", Required = Required.Default)]
+            public string Description { get; set; }
+        }
+end note
+alt Valid schema
+dbApi -> dbApi : Insert BsonDocument to mongo db
+end
+dev <-- dbApi : response status OkResult(); / BadRequestObjectResult(product);
 deactivate dbApi
 dev -> 3rd : ThirdAPISandbox.RegisterProduct()
 activate 3rd
