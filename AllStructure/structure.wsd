@@ -1,0 +1,91 @@
+@startuml
+
+package DevPortal {
+    class DevApi {
+        
+    }
+    class MContentApi {
+        
+    }
+    class FeatureApi {
+        
+    }
+    class ServiceApi {
+        
+    }
+    class DbSchemaApi {
+        
+    }
+}
+
+package Sandbox {
+    package "MobileApi" as mob_sand {
+        class "MerchantApi" as mer_sand {
+            
+        }
+        class "SubscritpionApi" as sub_sand {
+            
+        }
+    }
+    package "3rdApi" as 3rd_sand {
+        class "ApplicationFormApi" as apf_sand {
+            
+        }
+        class "CartApi" as crt_sand {
+            
+        }
+        class "EslipApi" as esp_sand {
+            
+        }
+        class "MembershipApi" as mem_sand {
+            
+        }
+        class "ProductApi" as pro_sand {
+            
+        }
+        class "ReminderApi" as rmd_sand {
+            
+        }
+        class "DbManageApi" as dbm_sand {
+            
+        }
+    }
+}
+package Production {
+    package "MobileApi" as mob_prod {
+        class "MerchantApi" as mer_prod {
+            
+        }
+        class "SubscritpionApi" as sub_prod {
+            
+        }
+    }
+    package "3rdApi" as 3rd_prod {
+        class "ApplicationFormApi" as apf_prod {
+            
+        }
+        class "CartApi" as crt_prod {
+            
+        }
+        class "EslipApi" as esp_prod {
+            
+        }
+        class "MembershipApi" as mem_prod {
+            
+        }
+        class "ProductApi" as pro_prod {
+            
+        }
+        class "ReminderApi" as rmd_prod {
+            
+        }
+        class "DbManageApi" as dbm_prod {
+            
+        }
+    }
+}
+
+DevPortal -up- Sandbox : publish
+DevPortal -left- Production : publish
+
+@enduml
