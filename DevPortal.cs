@@ -1,3 +1,4 @@
+[Route("api/[controller]")]
 public class DevController
 {
     [HttpGet]
@@ -10,75 +11,136 @@ public class DevController
     void CloseDevAccount();
 }
 
+[Route("api/[controller]")]
 public class ServiceController
 {
     [HttpGet]
-    DevAccount GetService();
+    ServiceInfo[] GetService();
     [HttpGet("{id}")]
-    DevAccount GetService(string id);
+    ServiceInfo GetService(string id);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request">
+    /// <list type="bullet">
+    /// <item>Production.SubscribeHookUrl</item>
+    /// <item>Sandbox.SubscribeHookUrl</item>
+    /// <item>AutoVerify</item>
+    /// </list>
+    /// </param>
+    /// <returns></returns>
     [HttpPost]
     ServiceRegistryInfo RegisterService(ServiceRequest request);
-    [HttpPut]
-    ServiceRegistryInfo UpdateService(ServiceRequest request);
-    [HttpPost]
-    ServiceRegistryInfo PublishService(ServiceRequest request);
-    [HttpDelete]
+    [HttpPut("{id}")]
+    ServiceRegistryInfo UpdateService(string id, ServiceRequest request);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>ServiceVersionId</returns>
+    [HttpPut("{id}/sandbox")]
+    ServiceRegistryInfo PublishServiceToSandbox(string id);
+    [HttpPut("{id}/v/{serviceVersionId}/production")]
+    ServiceRegistryInfo PublishServiceToProduction(string id, string serviceVersionId);
+    [HttpDelete("{id}")]
     void CloseService();
+    //service version management
 }
 
+[Route("api/{serviceid}/[controller]")]
 public class FeatureController
 {
-    [HttpPost]
-    HookRegistry EnableFeatureApplicationForm(ApplicationFormRequest request);
+    [HttpPost("appform")]
+    void EnableApplicationForm(ApplicationFormRequest request);
+    [HttpPost("reminder")]
+    HookRegistry[] EnableReminder(ReminderRequest request);
     /// <summary>
     /// 
     /// </summary>
     /// <param name="request">
     /// <list type="bullet">
-    /// <item>ProductHookUrl_prod</item>
-    /// <item>CartHookUrl_prod</item>
-    /// <item>CartResolutionHookUrl_prod</item>
-    /// <item>OrderHookUrl_prod</item>
-    /// <item>ProductHookUrl_sand</item>
-    /// <item>CartHookUrl_sand</item>
-    /// <item>CartResolutionHookUrl_sand</item>
-    /// <item>OrderHookUrl_sand</item>
+    /// <item>X Production.ExternalProductApiUrl ?? /product data hook for each product</item>
+    /// <item>Production.ProductHookUrl</item>
+    /// <item>Production.CartHookUrl</item>
+    /// <item>Production.CartResolutionHookUrl</item>
+    /// <item>Production.OrderHookUrl</item>
+    /// <item>X Sandbox.ExternalProductApiUrl ?? / product data hook for each product</item>
+    /// <item>Sandbox.ProductHookUrl</item>
+    /// <item>Sandbox.CartHookUrl</item>
+    /// <item>Sandbox.CartResolutionHookUrl</item>
+    /// <item>Sandbox.OrderHookUrl</item>
     /// </list>
     /// </param>
     /// <returns></returns>
-    [HttpPost]
-    HookRegistry EnableFeatureCart(CartRequest request);
+    [HttpPost("cart")]
+    HookRegistry[] EnableCart(CartRequest request);
     /// <summary>
     /// 
     /// </summary>
     /// <param name="request">
     /// <list type="bullet">
-    /// <item>ReceiveEslipHookUrl_prod</item>
-    /// <item>UseEslipHookUrl_prod</item>
-    /// <item>ReceiveEslipHookUrl_sand</item>
-    /// <item>UseEslipHookUrl_sand</item>
-    /// <item>UseEslipContentUrl_sand</item>
+    /// <item>Production.ReceiveEslipHookUrl</item>
+    /// <item>Production.UseEslipHookUrl</item>
+    /// <item>Sandbox.ReceiveEslipHookUrl</item>
+    /// <item>Sandbox.UseEslipHookUrl</item>
     /// </list>
     /// </param>
     /// <returns></returns>
-    [HttpPost]
-    HookRegistry EnableFeatureEslip(EslipRequest request);
+    [HttpPost("eslip")]
+    HookRegistry[] EnableEslip(EslipRequest request);
     /// <summary>
     /// 
     /// </summary>
     /// <param name="request">
     /// <list type="bullet">
-    /// <item>MemberRegisterHookUrl_prod</item>
-    /// <item>MemberRegisterHookUrl_sand</item>
+    /// <item>Production.MemberRegisterHookUrl</item>
+    /// <item>Sandbox.MemberRegisterHookUrl</item>
     /// </list>
     /// </param>
     /// <returns></returns>
-    [HttpPost]
-    HookRegistry EnableFeatureMembership(MembershipRequest request);
+    [HttpPost("membership")]
+    HookRegistry[] EnableMembership(MembershipRequest request);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request">
+    /// <list type="bullet">
+    /// <item>ProductCollectionName</item>
+    /// <item>IsAutorunProductId</item>
+    /// <item>AutorunProductIdPrefix</item>
+    /// </list>
+    /// </param>
+    /// <returns></returns>
+    [HttpPost("database")]
+    HookRegistry[] EnableInternalDatabase(DatabaseRequest request);
+
+    [HttpDelete("appform")]
+    void DisableApplicationForm();
+    [HttpDelete("reminder")]
+    void DisableReminder();
+    [HttpDelete("cart")]
+    void DisableCart();
+    [HttpDelete("eslip")]
+    void DisableEslip();
+    [HttpDelete("membership")]
+    void DisableMembership();
+    [HttpDelete("database")]
+    void DisableInternalDatabase();
 }
 
+[Route("api/{serviceid}/[controller]")]
 public class MContentController
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="mcontent">
+    /// <list type="bullet">
+    /// <item>Production.ContentUrl</item>
+    /// <item>Sandbox.ContentUrl</item>
+    /// </list>
+    /// </param>
+    /// <returns></returns>
     [HttpGet]
     MContent[] GetMContent();
     [HttpGet("{id}")]
@@ -109,14 +171,14 @@ public class MContentController
 /// API สำหรับให้ Dev จัดการ database schema ที่ mana เก็บให้
 /// Apply RouteParameter to all API?
 /// </summary>
+[Route("api/{serviceid}/[controller]")]
 public class DbSchemaController
 {
-    //TODO: GetDatabaseDetail, ConfigDatabase จำเป็นต้องมีมั้ย
     /// <summary>
-    /// Get Database Detail
+    /// Get Database Detail => จำเป็นต้องมีมั้ย
     /// </summary>
     /// <returns>Database Detail</returns>
-    DatabaseDetail GetCurrentDatabaseSchema();
+    DatabaseConfigurationDetail GetDatabaseSchema();
     /// <summary>
     /// Config Database
     /// </summary>
@@ -128,51 +190,122 @@ public class DbSchemaController
     /// - bla..
     /// </param>
     /// <returns>Database Detail</returns>
-    DatabaseDetail ConfigCurrentDatabaseSchema(DatabaseConfigurations configurations);
-    Response DeployToSandboxEnvironment(DatabaseConfigurations configurations);
-    Response DeployToProductionEnvironment(DatabaseConfigurations configurations);
+    DatabaseConfigurationDetail ConfigDatabaseSchema(DatabaseConfiguration configurations);
+    //***** DeployVersion[] GetSchemaVersion();
+    //***** /// <summary>
+    //***** /// Deploy To Sandbox Environment
+    //***** /// </summary>
+    //***** /// <param name="configurations">Specify database options</param>
+    //***** /// <returns>Response.SchemaVersionId</returns>
+    //***** Response DeployToSandboxEnvironment(DatabaseConfigurations configurations);
+    //***** Response DeployToProductionEnvironment(string schemaVersionId, DatabaseConfigurations configurations);
+    /// <summary>
+    /// Get single collection schema by name
+    /// </summary>
+    /// <param name="name">collection name</param>
+    /// <returns>Collection Schema</returns>
+    CollectionSchemaDetail GetCollectionSchema(string name);
+    /// <summary>
+    /// Get multiple collection schema
+    /// </summary>
+    /// <returns>list of collections schemas</returns>
+    IEnumerable<CollectionSchemaDetail> GetCollectionSchemas();
+    /// <summary>
+    /// Create collection schema
+    /// </summary>
+    /// <param name="schema">
+    /// Specify Collection Options
+    /// - autorun id
+    /// - autorun id prefix
+    /// </param>
+    /// <returns></returns>
+    CollectionSchemaDetail CreateCollectionSchema(CollectionSchema schema);
+    /// <summary>
+    /// Update collection schema
+    /// </summary>
+    /// <param name="name">collection name</param>
+    /// <param name="schema"></param>
+    /// <returns></returns>
+    CollectionSchemaDetail UpdateCollectionSchema(string name, CollectionSchema schema);
+    /// <summary>
+    /// Delete collection schema
+    /// </summary>
+    /// <param name="name">collection name</param>
+    /// <returns></returns>
+    void DropCollectionSchema(string name);
+    // IEnumerable<CollectionMapping> GetCollectionSchemaMappings();
+    // void SetupCollectionSchemaMappings(IEnumerable<CollectionMapping> mappings);
+}
+class DatabaseConfiguration
+{
+    public string ProductCollectionName { get; set; }
+    public bool AutoGenerateProductId { get; set; }
+    public bool ProductDataPrefixId { get; set; }
+}
+class DatabaseConfigurationDetail : DatabaseConfiguration
+{
+    public DateTime CreatedDate { get; set; }
+    public int CollectionCount { get; set; }
+}
+class CollectionSchema
+{
+    public string Name { get; set; }
+    public string DataPrefixId { get; set; }
+    public bool AutoGenerateId { get; set; }
+    public IEnumerable<string> Fields { get; set; }
+}
+class CollectionSchemaDetail : CollectionSchema
+{
+    public DateTime CreatedDate { get; set; }
+}
+// class CollectionMapping
+// {
+//     public string Name { get; set; }
+//     public string MapToName { get; set; }
+// }
+// class FieldMapping
+// {
+//     public string Name { get; set; }
+//     public Field NewField { get; set; }
+// }
+//=============================>
+class DatabaseSchema
+{
+    public string _id { get; set; }
+    public string ServiceId { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public IEnumerable<CollectionSchema> CollectionSchemas { get; set; }
+    
+}
+class CollectionSchema
+{
+    public string Name { get; set; }
+    public string DataPrefixId { get; set; }
+    public bool AutoGenerateId { get; set; }
+    public bool IsProductCollection { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public IEnumerable<string> Fields { get; set; }
+    //public CollectionMapping Mapping { get; set; }
+}
+//<=============================
 
+[Route("api/{serviceid}/[controller]")]
+public class SubscriptionController
+{
     /// <summary>
-    /// Get single collection detail by id
+    /// Get multiple subscription detail
     /// </summary>
-    /// <param name="collectionId">collection Id</param>
-    /// <param name="id">collection id</param>
-    /// <returns>Collection Detail</returns>
-    CollectionDetail GetCollectionDetail(string collectionId);
+    /// <param name="serviceid"></param>
+    /// <returns>list of documents detail</returns>
+    [HttpGet]
+    Subscription[] GetSubscriptions(string serviceid);
     /// <summary>
-    /// Get multiple collections detail
+    /// Get subscription detail
     /// </summary>
-    /// <returns>list of collections detail</returns>
-    IEnumerable<CollectionDetail> GetCollectionDetails();
-    /// <summary>
-    /// Create additional collection 
-    /// - 
-    /// </summary>
-    /// <param name="collectionName">collection Name</param>
-    /// <param name="schemas">
-    /// Specify Collection Options
-    /// - autorun id
-    /// - autorun id prefix
-    /// </param>
-    /// <returns></returns>
-    Response CreateCollection(string collectionName, CollectionSchemas schemas);
-    /// <summary>
-    /// Config additional collection
-    /// </summary>
-    /// <param name="collectionId">collection Id</param>
-    /// <param name="schemas">
-    /// Specify Collection Options
-    /// - autorun id
-    /// - autorun id prefix
-    /// </param>
-    /// <returns></returns>
-    Response ConfigCollection(string collectionId, CollectionSchemas schemas);
-    /// <summary>
-    /// Delete additional collection
-    /// </summary>
-    /// <param name="collectionId">collection id</param>
-    /// <returns></returns>
-    Response DropCollection(string collectionId);
-    IEnumerable<CollectionMappings> GetCollectionMappings();
-    Response SetupCollectionMappings(IEnumerable<CollectionMappings> mappings);
+    /// <param name="serviceid"></param>
+    /// <param name="id"></param>
+    /// <returns>list of documents detail</returns>
+    [HttpGet("{id}")]
+    Subscription GetSubscription(string serviceid, string id);
+    //approve subscription manualy
 }
