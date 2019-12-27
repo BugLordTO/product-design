@@ -48,47 +48,72 @@ public class ReminderController
 
 }
 
-[Route("api/{subscriptionid}/[controller]")]
+[Route("api/service/{serviceId}/merchant/{merchantId}/[controller]")]
 public class CartController
 {
-    [HttpPost("cart")]
+    /// <summary>
+    /// 
+    /// </summary>
+    [HttpPost()]
     Cart RegisterCart();
-    [HttpPost("cart/options")]
+    /// <summary>
+    /// 
+    /// </summary>
+    [HttpPost("options")]
     Cart RegisterCartOptions();
     /// <summary>
     /// Get default cart 
     /// </summary>
-    [HttpGet("cart/base")]
-    CartRegistry CartBase(string serviceId, string merchantId);
+    [HttpGet("base")]
+    Cart CartBase(string serviceId, string merchantId);
     /// <summary>
     /// Create default cart 
     /// </summary>
-    [HttpPost("cart/base")]
-    CartRegistry CartBase(string serviceId, string merchantId, Cart baseCart);
+    [HttpPost("base")]
+    Cart CartBase(string serviceId, string merchantId, Cart baseCart);
     /// <summary>
     /// Send bill to user after checkout
     /// </summary>
-    [HttpPost("cart/bill")]
+    [HttpPost("bill")]
     void SendBill(string serviceId, string merchantId, string cartId, Bill bill);
-
 }
 
-[Route("api/{subscriptionid}/[controller]")]
+[Route("api/service/{serviceId}/merchant/{merchantId}/[controller]")]
 public class ManaProductController
 {
     /// <summary>
     /// Get all product registry
     /// </summary>
-    IEnumerable<ProductRegistry> GetAllManaProducts(string prefix);
+    [HttpGet()]
+    IEnumerable<ProductRegistry> GetAllManaProducts(string serviceId,string merchantId);
+    /// <summary>
+    /// Get a product 
+    /// </summary>
+    [HttpGet("{refid}")]
+    IEnumerable<ProductRegistry> GetManaProduct(string serviceId,string merchantId, string refid);
     /// <summary>
     /// Register product
     /// </summary>
-    ManaLinkRegistry RegisterManaProduct(string prefix, string refid);
+    [HttpPost("{refid}/mcontent/{mcintentId}")]
+    ManaLinkRegistry RegisterManaProduct(string serviceId,string merchantId, string refid, string mcontentId);
     /// <summary>
     /// Register multiple products
     /// </summary>
-    IEnumerable<ManaLinkRegistry> RegisterManaProductBatch(string prefix, IEnumerable<string> refids);
+    [HttpPost("mcontent/{mcintentId}")]
+    IEnumerable<ManaLinkRegistry> RegisterManaProductBatch(string serviceId,string merchantId, IEnumerable<string> refids, string mcontentId);
     // remove/disable/suspend ManaProduct qr/endpoint
+
+    /// <summary>
+    /// Updatw product
+    /// </summary>
+    [HttpPut("{refid}/mcontent/{mcintentId}")]
+    ManaLinkRegistry UpdateManaProduct(string serviceId,string merchantId, string refid, string mcontentId);
+    /// <summary>
+    /// Updatw product
+    /// </summary>
+    [HttpDelete("{refid}")]
+    ManaLinkRegistry RemoveManaProduct(string serviceId,string merchantId, string refid);
+
 
     //***** /// <summary>
     //***** /// Register ProductOptions
@@ -101,24 +126,24 @@ public class ManaProductController
     //***** void RegisterProductApi(ProductApiRequest request);
 }
 
-[Route("api/{subscriptionid}/[controller]")]
+[Route("api/service/{serviceId}/merchant/{merchantId}/[controller]")]
 public class ProductController
 {
     [HttpGet]
     Product[] GetProducts();
     [HttpGet("{id}")]
-    Product GetProduct(string subscriptionid, string id);
+    Product GetProduct(string serviceId,string merchantId, string id);
     [HttpPost]
-    ProductRegistry RegisterProduct(string subscriptionid, Product product);
-    [HttpPut("{id}")]
-    ProductRegistry EditProduct(string subscriptionid, Product product);
+    ProductRegistry RegisterProduct(string serviceId,string merchantId, Product product);
+    [HttpPut]
+    ProductRegistry EditProduct(string serviceId,string merchantId, Product product);
     [HttpDelete("{id}")]
-    ProductRegistry DeleteProduct(string subscriptionid, string id);
+    ProductRegistry DeleteProduct(string serviceId,string merchantId, string id);
     //[HttpPost("{id}")]
     //ProductRegistry RegisterProductOption(string subscriptionid, ProductOption productOption);
 }
 
-[Route("api/{subscriptionid}/[controller]")]
+[Route("api/subscription/{subscriptionid}/[controller]")]
 public class DatabaseController
 {
     /// <summary>
@@ -128,7 +153,7 @@ public class DatabaseController
     /// <param name="options">???</param>
     /// <returns>generated id</returns>
     [HttpPost("{prefix}")]
-    string GenerateId(string serviceid, string subscriptionid, string prefix, GenerateIdOptions options = null);
+    string GenerateId(string subscriptionid, string prefix, GenerateIdOptions options = null);
 
     /// <summary>
     /// Get single document detail by id
@@ -137,23 +162,23 @@ public class DatabaseController
     /// <param name="id">document id</param>
     /// <param name="querySyntax">???</param>
     /// <returns>document detail</returns>
-    [HttpGet("{collectionName}/{id}")]
-    Document GetDocument(string serviceid, string subscriptionid, string collectionName, string id, string querySyntax);
+    [HttpGet("collection/{name}/document/{id}/qry/{querySyntax}")]
+    Document GetDocument(string subscriptionid, string name, string id, string querySyntax);
     /// <summary>
     /// Get multiple documents detail
     /// </summary>
     /// <param name="querySyntax">???</param>
     /// <returns>list of documents detail</returns>
-    [HttpGet("{collectionName}")]
-    IEnumerable<Document> GetDocuments(string serviceid, string subscriptionid, string collectionName, string querySyntax);
+    [HttpGet("collection/{name}/qry/{querySyntax}")]
+    IEnumerable<Document> GetDocuments(string subscriptionid, string name, string querySyntax);
     /// <summary>
     /// Create document to specify collection
     /// </summary>
     /// <param name="collectionName">collection id</param>
     /// <param name="document">Creating document</param>
     /// <returns></returns>
-    [HttpPost("{collectionName}")]
-    Response CreateDocument(string serviceid, string subscriptionid, string collectionName, Document document);
+    [HttpPost("collection/{name}")]
+    Response CreateDocument(string subscriptionid, string name, Document document);
     /// <summary>
     /// Edit document to specify collection
     /// </summary>
@@ -161,15 +186,15 @@ public class DatabaseController
     /// <param name="id">document id</param>
     /// <param name="document">Editing document</param>
     /// <returns></returns>
-    [HttpPut("{collectionName}/{id}")]
-    Response EditDocument(string serviceid, string subscriptionid, string collectionName, string id, Document document);
+    [HttpPut("collection/{name}/document/{id}")]
+    Response EditDocument(string subscriptionid, string name, string id, Document document);
     /// <summary>
     /// Delete document from specify collection
     /// </summary>
     /// <param name="collectionName">collection id</param>
     /// <param name="id">The document id</param>
     /// <returns></returns>
-    [HttpDelete("{collectionName}/{id}")]
-    Response DeleteDocument(string serviceid, string subscriptionid, string collectionName, string id);
+    [HttpDelete("collection/{name}/document/{id}")]
+    Response DeleteDocument(string subscriptionid, string name, string id);
     //backup whole db
 }

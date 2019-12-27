@@ -191,14 +191,6 @@ public class DbSchemaController
     /// </param>
     /// <returns>Database Detail</returns>
     DatabaseConfigurationDetail ConfigDatabaseSchema(DatabaseConfiguration configurations);
-    //***** DeployVersion[] GetSchemaVersion();
-    //***** /// <summary>
-    //***** /// Deploy To Sandbox Environment
-    //***** /// </summary>
-    //***** /// <param name="configurations">Specify database options</param>
-    //***** /// <returns>Response.SchemaVersionId</returns>
-    //***** Response DeployToSandboxEnvironment(DatabaseConfigurations configurations);
-    //***** Response DeployToProductionEnvironment(string schemaVersionId, DatabaseConfigurations configurations);
     /// <summary>
     /// Get single collection schema by name
     /// </summary>
@@ -233,8 +225,6 @@ public class DbSchemaController
     /// <param name="name">collection name</param>
     /// <returns></returns>
     void DropCollectionSchema(string name);
-    // IEnumerable<CollectionMapping> GetCollectionSchemaMappings();
-    // void SetupCollectionSchemaMappings(IEnumerable<CollectionMapping> mappings);
 }
 class DatabaseConfiguration
 {
@@ -258,17 +248,7 @@ class CollectionSchemaDetail : CollectionSchema
 {
     public DateTime CreatedDate { get; set; }
 }
-// class CollectionMapping
-// {
-//     public string Name { get; set; }
-//     public string MapToName { get; set; }
-// }
-// class FieldMapping
-// {
-//     public string Name { get; set; }
-//     public Field NewField { get; set; }
-// }
-//=============================>
+//=============================> DB
 class DatabaseSchema
 {
     public string _id { get; set; }
@@ -285,9 +265,8 @@ class CollectionSchema
     public bool IsProductCollection { get; set; }
     public DateTime CreatedDate { get; set; }
     public IEnumerable<string> Fields { get; set; }
-    //public CollectionMapping Mapping { get; set; }
 }
-//<=============================
+//DB <=============================
 
 [Route("api/{serviceid}/[controller]")]
 public class SubscriptionController
